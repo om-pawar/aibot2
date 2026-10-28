@@ -1,0 +1,1280 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f7fb" />
+  <meta name="description" content="AI Student Helpdesk — Your 24/7 college assistant for exam guidance, assignments, attendance, practicals and study tips." />
+  <title>AI Student Helpdesk — Your 24/7 College Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light dark;
+      --primary: #4f46e5;
+      --primary-strong: #4338ca;
+      --primary-soft: #e8eaff;
+      --on-primary-soft: #302c81;
+      --page: light-dark(#f5f7fb, #101321);
+      --surface: light-dark(#ffffff, #171b2b);
+      --surface-soft: light-dark(#f8f9ff, #202539);
+      --text: light-dark(#182033, #f3f5ff);
+      --muted: light-dark(#69738a, #aab2ca);
+      --border: light-dark(#e3e7f1, #343b52);
+      --input: light-dark(#ffffff, #1a2032);
+      --bot-bubble: light-dark(#f2f4fb, #242b40);
+      --shadow: 0 16px 48px rgba(28, 38, 79, 0.08);
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--page); color: var(--text); }
+    body { min-height: 100vh; }
+    #root { min-height: 100vh; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid #a5b4fc; outline-offset: 3px; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+    .app-root { min-height: 100vh; width: 100%; background: var(--page); padding: 22px; position: relative; overflow: hidden; }
+    .app-root::before { content: ""; position: absolute; top: -160px; right: -130px; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0)); pointer-events: none; }
+    .shell { max-width: 1440px; margin: 0 auto; position: relative; z-index: 1; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 24px; }
+    .brand { display: flex; gap: 12px; align-items: center; min-width: 0; color: inherit; text-decoration: none; background: none; border: none; padding: 0; }
+    .brand:hover { cursor: pointer; }
+    .brand-mark { width: 46px; height: 46px; flex: 0 0 46px; display: grid; place-items: center; border-radius: 15px; color: #fff; font-size: 26px; background: linear-gradient(145deg, #6962f4, var(--primary-strong)); box-shadow: 0 8px 20px rgba(79, 70, 229, .24); }
+    .brand-copy { display: grid; gap: 4px; text-align: left; }
+    .brand-title { font-size: 17px; font-weight: 800; letter-spacing: -.45px; line-height: 1.18; }
+    .brand-sub { color: var(--muted); font-size: 12px; }
+    .top-actions { display: flex; gap: 10px; align-items: center; }
+    .availability { border: 1px solid light-dark(#ccebdc, #285642); background: light-dark(#edfbf4, #162f27); color: light-dark(#16754d, #8ce0b8); font-size: 12px; font-weight: 700; padding: 9px 12px; border-radius: 100px; display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+    .status-dot { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: #22c783; box-shadow: 0 0 0 3px rgba(34, 199, 131, .13); display: inline-block; }
+    .icon-button { border: 1px solid var(--border); color: var(--text); background: var(--surface); border-radius: 12px; min-height: 40px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 650; font-size: 12px; transition: background .18s, transform .18s; }
+    .icon-button:hover { background: var(--surface-soft); transform: translateY(-1px); }
+    .icon-button span { font-size: 17px; }
+    .layout { display: grid; grid-template-columns: 264px minmax(0, 1fr); gap: 20px; align-items: stretch; }
+    .side-panel, .chat-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow); }
+    .side-panel { padding: 22px 17px; display: flex; flex-direction: column; gap: 24px; min-height: 690px; }
+    .side-heading { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 1.45px; text-transform: uppercase; padding: 0 9px; margin: 0 0 11px; }
+    .nav-list { display: grid; gap: 6px; }
+    .nav-item { width: 100%; display: flex; align-items: center; gap: 11px; text-align: left; border: 0; border-radius: 12px; padding: 11px 10px; color: var(--text); background: transparent; font-size: 13px; font-weight: 620; transition: background .18s; }
+    .nav-item:hover { background: var(--surface-soft); }
+    .nav-item.active { background: var(--primary-soft); color: var(--on-primary-soft); }
+    .nav-icon { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 9px; background: light-dark(#f0f2fa, #2a3148); color: light-dark(#5b647d, #c4c9e3); flex: 0 0 auto; font-size: 18px; }
+    .nav-item.active .nav-icon { background: rgba(79, 70, 229, .12); color: var(--primary); }
+    .nav-label { flex: 1; }
+    .mini-card { margin-top: auto; padding: 15px; background: linear-gradient(145deg, light-dark(#f2f2ff, #252643), light-dark(#f8f7ff, #252a42)); border: 1px solid light-dark(#e0e0ff, #383b68); border-radius: 16px; }
+    .mini-card-icon { height: 34px; width: 34px; display: grid; place-items: center; border-radius: 11px; background: rgba(99, 102, 241, .14); color: #7771f8; margin-bottom: 11px; font-weight: 800; }
+    .mini-card strong { display: block; font-size: 12px; margin-bottom: 6px; }
+    .mini-card p { color: var(--muted); font-size: 11px; line-height: 1.55; margin: 0; }
+    .privacy { margin-top: 12px; font-size: 10px; color: var(--muted); display: flex; gap: 5px; align-items: center; }
+    .privacy span { color: #22a878; font-size: 8px; }
+    .shape-grid { position: relative; width: 100%; height: 100%; overflow: hidden; }
+    .shape-grid-canvas { position: absolute; top: 0; left: 0; display: block; transform-origin: 0 0; }
+    .chat-grid-backdrop { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .chat-panel { min-height: 690px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+    .chat-header { padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; gap: 14px; border-bottom: 1px solid var(--border); position: relative; z-index: 2; background: var(--surface); }
+    .assistant-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .assistant-avatar { height: 41px; width: 41px; flex: 0 0 41px; border-radius: 14px; display: grid; place-items: center; color: #fff; font-size: 23px; background: linear-gradient(145deg, #736af5, var(--primary)); }
+    .assistant-name { font-size: 14px; font-weight: 760; }
+    .assistant-state { margin-top: 4px; color: var(--muted); font-size: 11px; display: flex; align-items: center; gap: 6px; }
+    .chat-header-tag { background: var(--surface-soft); color: var(--muted); border: 1px solid var(--border); border-radius: 9px; padding: 8px 10px; font-size: 10px; font-weight: 750; white-space: nowrap; }
+    .chat-body { flex: 1; padding: 27px clamp(18px, 4vw, 48px) 20px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; min-height: 440px; max-height: 550px; scroll-behavior: smooth; position: relative; z-index: 1; background: transparent; }
+    .welcome { max-width: 630px; margin: 5px auto 1px; text-align: center; }
+    .welcome-orb { margin: 0 auto 15px; width: 58px; height: 58px; border-radius: 19px; display: grid; place-items: center; background: linear-gradient(145deg, #e8eaff, #f5f1ff); color: #5751df; border: 1px solid #dcdcff; font-size: 30px; }
+    .eyebrow { color: var(--primary); font-size: 10px; font-weight: 850; letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 9px; }
+    .welcome h1 { font-size: clamp(26px, 3vw, 37px); line-height: 1.14; letter-spacing: -1.15px; margin: 0; font-weight: 820; }
+    .gradient-text { color: var(--primary); }
+    .welcome p { max-width: 520px; color: var(--muted); line-height: 1.65; margin: 13px auto 0; font-size: 13px; }
+    .quick-section { max-width: 650px; width: 100%; margin: 4px auto 0; }
+    .quick-title { display: flex; gap: 8px; align-items: center; font-size: 11px; color: var(--muted); font-weight: 750; margin-bottom: 11px; }
+    .quick-title span { color: var(--primary); }
+    .quick-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .quick-button { min-height: 82px; border: 1px solid var(--border); background: var(--surface); border-radius: 14px; padding: 13px 12px; text-align: left; color: var(--text); display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 10px; transition: border-color .18s, background .18s, transform .18s; }
+    .quick-button:hover { border-color: #b5b3ff; background: var(--surface-soft); transform: translateY(-2px); }
+    .quick-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 9px; color: var(--primary); background: var(--primary-soft); font-size: 17px; }
+    .quick-button span:last-child { font-size: 11px; font-weight: 750; }
+    .message-row { display: flex; gap: 10px; align-items: flex-start; width: 100%; animation: appear .22s ease-out; }
+    .message-row.user { justify-content: flex-end; }
+    .message-avatar { flex: 0 0 30px; width: 30px; height: 30px; display: grid; place-items: center; background: var(--primary-soft); color: var(--primary); border-radius: 10px; font-size: 17px; }
+    .message-row.user .message-avatar { order: 2; background: var(--primary); color: #fff; }
+    .message-wrap { max-width: min(80%, 680px); }
+    .message-meta { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 10px; margin: 0 0 6px 2px; }
+    .message-row.user .message-meta { justify-content: flex-end; margin-right: 2px; }
+    .message-bubble { font-size: 12px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 4px 15px 15px 15px; padding: 12px 15px; background: var(--bot-bubble); border: 1px solid var(--border); color: var(--text); }
+    .message-row.user .message-bubble { background: var(--primary); color: #fff; border-color: var(--primary); border-radius: 15px 4px 15px 15px; }
+    .typing { display: inline-flex; align-items: center; gap: 4px; height: 17px; }
+    .typing i { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); animation: bounce 1s infinite ease-in-out; display: inline-block; }
+    .typing i:nth-child(2) { animation-delay: .15s; }
+    .typing i:nth-child(3) { animation-delay: .3s; }
+    .chat-footer { padding: 15px 24px 18px; border-top: 1px solid var(--border); background: var(--surface); }
+    .composer { display: flex; align-items: center; gap: 10px; max-width: 900px; margin: 0 auto; padding: 7px 8px 7px 15px; border-radius: 15px; border: 1px solid var(--border); background: var(--input); transition: border-color .18s, box-shadow .18s; }
+    .composer:focus-within { border-color: #aaa7ff; box-shadow: 0 0 0 3px rgba(99, 102, 241, .09); }
+    .composer input { min-width: 0; flex: 1; border: 0; outline: 0; color: var(--text); background: transparent; font-size: 12px; padding: 9px 0; }
+    .composer input::placeholder { color: var(--muted); }
+    .send-button { width: 41px; height: 41px; flex: 0 0 41px; border: 0; border-radius: 12px; display: grid; place-items: center; color: #fff; background: var(--primary); box-shadow: 0 5px 12px rgba(79, 70, 229, .22); transition: filter .18s, transform .18s; }
+    .send-button:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .send-button span { font-size: 19px; transform: translateX(1px); }
+    .composer-hint { color: var(--muted); font-size: 10px; text-align: center; margin-top: 11px; line-height: 1.5; }
+    .composer-hint strong { color: var(--text); font-weight: 700; }
+    .footer-line { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-top: 19px; color: var(--muted); font-size: 10px; }
+    .footer-brand { display: inline-flex; align-items: center; gap: 6px; }
+    .footer-brand span { color: var(--primary); }
+    .keyboard { display: inline-flex; align-items: center; gap: 5px; }
+    kbd { border: 1px solid var(--border); border-radius: 5px; padding: 2px 5px; font: inherit; background: var(--surface-soft); }
+    .toast { position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 15px); opacity: 0; pointer-events: none; padding: 11px 16px; z-index: 20; background: var(--text); color: var(--surface); font-size: 12px; border-radius: 11px; box-shadow: var(--shadow); transition: .22s; max-width: calc(100vw - 30px); text-align: center; }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+    @keyframes appear { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+
+    @media (max-width: 900px) {
+      .app-root { padding: 16px; }
+      .layout { grid-template-columns: minmax(0, 1fr); }
+      .side-panel { display: none; }
+      .chat-panel { min-height: calc(100vh - 110px); }
+      .chat-body { max-height: none; min-height: 440px; }
+      .topbar { margin-bottom: 15px; }
+      .brand-title { font-size: 15px; }
+      .brand-sub { font-size: 11px; }
+    }
+    @media (max-width: 540px) {
+      .app-root { padding: 12px; }
+      .brand-mark { width: 40px; height: 40px; flex-basis: 40px; border-radius: 13px; }
+      .brand { gap: 9px; }
+      .brand-title { font-size: 13px; letter-spacing: -.3px; }
+      .brand-sub { font-size: 10px; }
+      .availability { font-size: 0; padding: 11px; gap: 0; }
+      .top-actions { gap: 6px; }
+      .chat-panel { border-radius: 18px; min-height: calc(100vh - 87px); }
+      .chat-header { padding: 13px 14px; }
+      .assistant-avatar { width: 36px; height: 36px; flex-basis: 36px; border-radius: 12px; }
+      .assistant-name { font-size: 12px; }
+      .assistant-state { font-size: 10px; }
+      .chat-header-tag { font-size: 9px; padding: 7px; }
+      .chat-body { padding: 22px 13px 17px; gap: 17px; }
+      .welcome { margin-top: 2px; }
+      .welcome-orb { width: 52px; height: 52px; border-radius: 17px; margin-bottom: 12px; }
+      .welcome h1 { font-size: 28px; }
+      .welcome p { font-size: 12px; }
+      .quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .quick-button { min-height: 74px; padding: 10px; }
+      .quick-button:last-child { grid-column: span 2; min-height: 58px; flex-direction: row; align-items: center; justify-content: flex-start; }
+      .message-wrap { max-width: 86%; }
+      .message-bubble { font-size: 12px; padding: 10px 12px; }
+      .chat-footer { padding: 12px 11px 13px; }
+      .composer { padding-left: 11px; gap: 6px; }
+      .composer input { font-size: 12px; }
+      .send-button { height: 38px; width: 38px; flex-basis: 38px; border-radius: 11px; }
+      .composer-hint { font-size: 9px; }
+      .footer-line { margin-top: 13px; font-size: 9px; }
+      .keyboard { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // ─── FAQ data ─────────────────────────────────────────────────────────────
+    const FAQ = [
+      {
+        keys: ['exam','examination','test','paper','revision','study for exam','hall ticket','timetable'],
+        answer: '📚 EXAM GUIDANCE\n\n• Check your course syllabus and make a list of topics.\n• Practise previous questions or sample papers, if your faculty provides them.\n• Revise a little every day and attempt timed practice.\n• Confirm exam dates, seating, hall-ticket instructions and permitted materials through your official college notice or exam department.\n\nI don\'t have your college\'s live exam timetable, so I won\'t guess dates or rules.'
+      },
+      {
+        keys: ['assignment','assignments','homework','submission','submit','project report','deadline'],
+        answer: '📝 ASSIGNMENT GUIDANCE\n\n1. Read the question and marking criteria carefully.\n2. Break the work into small tasks: research, outline, draft and review.\n3. Use class notes and reliable sources; explain ideas in your own words.\n4. Check formatting, references and file type before submitting.\n5. Keep a backup and submit using the method your faculty specified.\n\nFor the exact deadline, extension policy or submission portal, confirm with your subject teacher or department.'
+      },
+      {
+        keys: ['attendance','absent','absence','medical leave','leave application','attendance percentage','shortage'],
+        answer: '📅 ATTENDANCE GUIDANCE\n\nAttendance requirements and leave procedures vary by college, course and university. I don\'t have your official attendance record or policy, so I should not give you a percentage or claim a rule.\n\nPlease check your student portal or attendance register, then contact your class teacher, mentor or department office about the applicable requirement and any leave documents.'
+      },
+      {
+        keys: ['practical','practicals','lab','laboratory','journal','viva','experiment','lab record'],
+        answer: '🧪 PRACTICALS & LAB PREPARATION\n\n• Read the experiment aim, theory, apparatus and procedure before the session.\n• Keep your practical journal or record updated as instructed by your faculty.\n• Understand the steps and expected observations instead of memorising only the result.\n• Follow lab safety instructions and ask before using unfamiliar equipment.\n• For a viva, practise explaining the aim, principle, procedure and result in simple words.\n\nCheck with your lab instructor for your batch timing, record format and assessment requirements.'
+      },
+      {
+        keys: ['activity','activities','event','events','festival','club','clubs','competition','college fest','student council'],
+        answer: '🎓 COLLEGE ACTIVITIES\n\nA good place to start is your college\'s official notice board, student portal, department group or student council / club announcements. Ask the event coordinator about registration, eligibility, venue and deadlines.\n\nI don\'t have access to your college\'s live event calendar, so please verify dates and registration links through an official channel.'
+      },
+      {
+        keys: ['study tip','study tips','how to study','focus','concentrate','remember','memorize','memorise','time management','study schedule','timetable for study','procrastinate'],
+        answer: '💡 SIMPLE STUDY TIPS\n\n• Try 25 minutes of focused study, then take a 5-minute break.\n• Use active recall: close your notes and explain the idea from memory.\n• Revise topics over several days instead of cramming once.\n• Solve questions and review mistakes; reading alone is not enough.\n• Set 2-3 realistic priorities each day and keep your phone away during focus time.\n• Sleep enough before an exam so you can think clearly.\n\nTell me your subject and exam date, and I can help make a simple revision plan.'
+      },
+      {
+        keys: ['scholarship','fees','fee payment','fee structure','financial aid','hostel','transport','bus pass','library','id card','identity card','certificate','bonafide','transcript'],
+        answer: '🏫 COLLEGE OFFICE GUIDANCE\n\nThis usually depends on your institution\'s current process and documents. I don\'t have access to your college\'s student records or official procedures. Please contact the relevant college office (such as accounts, student section, library or hostel office) and check the official portal for the current form, fee, deadline and required documents.'
+      },
+      {
+        keys: ['hello','hi','hey','good morning','good afternoon','good evening'],
+        answer: 'Hi there! 👋 I\'m your AI Student Helpdesk demo assistant. You can ask me about exam preparation, assignments, attendance, practicals, study tips or college activities. For official college rules or current dates, I\'ll point you to the right department rather than make something up.'
+      },
+      {
+        keys: ['what can you do','help me','topics','who are you','what are you'],
+        answer: 'I can help with general exam preparation, assignment planning, practical/lab preparation, study habits and where to confirm attendance or college activity information. I use a sample FAQ in this demo, not a live college database. Ask away, and I\'ll tell you when something needs official confirmation.'
+      }
+    ];
+
+    const OFFICIAL_PATTERN = /\b(minimum|mandatory|required|allowed|eligible|rule|policy|percentage|marks|passing|grace|detained|backlog|supplementary|reexam|re-exam|date|when is|deadline|fee amount|exact|official|semester result|result date|exam date)\b/i;
+
+    function normalise(v) {
+      return v.toLowerCase().replace(/[^a-z0-9\s%'-]/g,' ').replace(/\s+/g,' ').trim();
+    }
+
+    function getAnswer(question) {
+      const q = normalise(question);
+      const found = FAQ.find(item => item.keys.some(key => {
+        const k = normalise(key);
+        return q.includes(k) || (k.length > 5 && k.split(' ').length > 1 && k.split(' ').every(w => q.includes(w)));
+      }));
+      if (found) return found.answer;
+      if (OFFICIAL_PATTERN.test(q)) return 'I don\'t have verified, current information for that official college rule or date, and I don\'t want to mislead you. Please contact your class teacher, department office or examination section, or check your college\'s official notice / student portal.';
+      return 'I\'m sorry — I don\'t have a reliable answer to that question in my sample college FAQ. I don\'t want to invent information. Please contact your class teacher or the relevant college department for an accurate answer.\n\nYou can also ask me about exam preparation, assignments, attendance guidance, practicals, study tips or college activities.';
+    }
+
+    function getTime() {
+      return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // ─── ShapeGrid (React Bits) ───────────────────────────────────────────────
+const SHAPES = ['square', 'tile', 'hexagon', 'triangle', 'diamond', 'circle', 'cross', 'dot'];
+const DIRECTIONS = {
+  right: [1, 0],
+  left: [-1, 0],
+  up: [0, -1],
+  down: [0, 1],
+  diagonal: [Math.SQRT1_2, -Math.SQRT1_2],
+  none: [0, 0]
+};
+const SQRT3 = Math.sqrt(3);
+const OFFSET = 32768;
+const FAR = 2.5;
+const MAX_PIXELS = 8e6;
+
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+const smoothstep = (edge0, edge1, value) => {
+  const t = clamp((value - edge0) / (edge1 - edge0), 0, 1);
+  return t * t * (3 - 2 * t);
+};
+
+const smootherstep = t => t * t * t * (t * (t * 6 - 15) + 10);
+
+const hash = (i, j) => {
+  const s = Math.sin(i * 127.1 + j * 311.7) * 43758.5453;
+  return s - Math.floor(s);
+};
+
+const keyOf = (i, j) => (i + OFFSET) * 65536 + (j + OFFSET);
+
+const fadeMask = amount => {
+  if (amount <= 0) return 'none';
+  const edge = amount * 26;
+  const stops = [];
+  for (let k = 0; k <= 8; k++) {
+    const t = k / 8;
+    stops.push(`rgba(0, 0, 0, ${smootherstep(t).toFixed(3)}) ${(t * edge).toFixed(2)}%`);
+  }
+  const inner = stops.join(', ');
+  const outer = [...stops]
+    .reverse()
+    .map(stop => stop.replace(/ ([\d.]+)%$/, (_, value) => ` ${(100 - parseFloat(value)).toFixed(2)}%`))
+    .join(', ');
+  const axis = direction => `linear-gradient(${direction}, ${inner}, ${outer})`;
+  return `${axis('to right')}, ${axis('to bottom')}`;
+};
+
+const lightnessOf = color => {
+  let hex = String(color).trim().replace(/^#/, '');
+  if (hex.length === 3 || hex.length === 4) hex = hex.replace(/./g, '$&$&');
+  hex = hex.slice(0, 6);
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return 0.6;
+  const value = parseInt(hex, 16);
+  const channels = [value >> 16, (value >> 8) & 255, value & 255];
+  return (Math.max(...channels) + Math.min(...channels)) / 510;
+};
+
+const tint = (hue, lightness) =>
+  `hsl(${(((hue % 360) + 360) % 360).toFixed(1)}, 90%, ${(lightness * 100).toFixed(1)}%)`;
+
+const multiply = (a, b) =>
+  [0, 1, 2, 3, 4, 5, 6, 7, 8].map(k => {
+    const r = k - (k % 3);
+    const c = k % 3;
+    return a[r] * b[c] + a[r + 1] * b[c + 3] + a[r + 2] * b[c + 6];
+  });
+
+const invert = m => {
+  const [a, b, c, d, e, f, g, h, i] = m;
+  const A = e * i - f * h;
+  const B = f * g - d * i;
+  const C = d * h - e * g;
+  const det = a * A + b * B + c * C;
+  return [A, c * h - b * i, b * f - c * e, B, a * i - c * g, c * d - a * f, C, b * g - a * h, a * e - b * d].map(
+    value => value / det
+  );
+};
+
+const project = (m, x, y) => {
+  const w = m[6] * x + m[7] * y + m[8];
+  return [(m[0] * x + m[1] * y + m[2]) / w, (m[3] * x + m[4] * y + m[5]) / w];
+};
+
+const flatView = (width, height) => ({
+  x0: 0,
+  y0: 0,
+  width,
+  height,
+  inverse: null,
+  transform: 'none',
+  mist: null,
+  far: FAR,
+  reach: Math.hypot(width, height) / 2
+});
+
+const viewFor = (tiltX, tiltY, width, height, cellSize) => {
+  if (!tiltX && !tiltY) return flatView(width, height);
+  const ax = (tiltX * Math.PI) / 180;
+  const ay = (tiltY * Math.PI) / 180;
+  const depth = Math.max(width, height) * 1.25;
+  const cx = width / 2;
+  const cy = height / 2;
+  const tilt = [
+    Math.cos(ay),
+    0,
+    0,
+    Math.sin(ax) * Math.sin(ay),
+    Math.cos(ax),
+    0,
+    (Math.sin(ay) * Math.cos(ax)) / depth,
+    -Math.sin(ax) / depth,
+    1
+  ];
+  const forward = multiply(multiply([1, 0, cx, 0, 1, cy, 0, 0, 1], tilt), [1, 0, -cx, 0, 1, -cy, 0, 0, 1]);
+  const inverse = invert(forward);
+  const facing = Math.cos(ax) * Math.cos(ay);
+  const far = clamp(Math.sqrt((facing * cellSize) / 5), 1.15, FAR);
+  const near = Math.min(Math.sqrt((facing * cellSize) / 14), far - 0.35);
+  const nearness = (x, y) => inverse[6] * x + inverse[7] * y + inverse[8] - 1 / far;
+  const corners = [
+    [0, 0],
+    [width, 0],
+    [width, height],
+    [0, height]
+  ];
+  let x0 = Infinity;
+  let y0 = Infinity;
+  let x1 = -Infinity;
+  let y1 = -Infinity;
+  const include = (x, y) => {
+    const [px, py] = project(inverse, x, y);
+    x0 = Math.min(x0, px);
+    y0 = Math.min(y0, py);
+    x1 = Math.max(x1, px);
+    y1 = Math.max(y1, py);
+  };
+  corners.forEach((a, k) => {
+    const b = corners[(k + 1) % 4];
+    const na = nearness(a[0], a[1]);
+    const nb = nearness(b[0], b[1]);
+    if (na >= 0) include(a[0], a[1]);
+    if (na >= 0 !== nb >= 0) {
+      const t = na / (na - nb);
+      include(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t);
+    }
+  });
+  if (!(x1 > x0 && y1 > y0)) return flatView(width, height);
+  x0 = Math.floor(x0 / 16) * 16;
+  y0 = Math.floor(y0 / 16) * 16;
+  x1 = Math.ceil(x1 / 16) * 16;
+  y1 = Math.ceil(y1 / 16) * 16;
+  const m = multiply(forward, [1, 0, x0, 0, 1, y0, 0, 0, 1]);
+  const transform = `matrix3d(${[m[0], m[3], 0, m[6], m[1], m[4], 0, m[7], 0, 0, 1, 0, m[2], m[5], 0, m[8]].join(', ')})`;
+  const gx = forward[6];
+  const gy = forward[7];
+  const slope = Math.hypot(gx, gy);
+  const mist =
+    slope > 1e-9
+      ? [
+          cx + (gx / slope) * ((near - 1) / slope),
+          cy + (gy / slope) * ((near - 1) / slope),
+          cx + (gx / slope) * ((far - 1) / slope),
+          cy + (gy / slope) * ((far - 1) / slope)
+        ]
+      : null;
+  const reach = Math.max(
+    Math.hypot(x0 - cx, y0 - cy),
+    Math.hypot(x1 - cx, y0 - cy),
+    Math.hypot(x1 - cx, y1 - cy),
+    Math.hypot(x0 - cx, y1 - cy)
+  );
+  return { x0, y0, width: x1 - x0, height: y1 - y0, inverse, transform, mist, far, reach };
+};
+
+const layoutFor = (shape, size) => {
+  if (shape === 'hexagon') {
+    const radius = size / SQRT3;
+    return { stepX: radius * 1.5, stepY: size, radius };
+  }
+  if (shape === 'triangle') {
+    const side = (size * 2) / SQRT3;
+    return { stepX: side / 2, stepY: size, side };
+  }
+  return { stepX: size, stepY: size };
+};
+
+const centerOf = (shape, layout, i, j) => {
+  const { stepX, stepY } = layout;
+  if (shape === 'hexagon') return [i * stepX, j * stepY + (Math.abs(i) % 2 === 1 ? stepY / 2 : 0)];
+  if (shape === 'triangle') {
+    const up = (((i + j) % 2) + 2) % 2 === 0;
+    return [i * stepX, j * stepY + (up ? stepY * (2 / 3) : stepY / 3)];
+  }
+  if (shape === 'cross' || shape === 'dot') return [i * stepX, j * stepY];
+  return [(i + 0.5) * stepX, (j + 0.5) * stepY];
+};
+
+const traceCell = (ctx, shape, layout, size, i, j, x, y, inset) => {
+  if (shape === 'hexagon') {
+    const r = layout.radius - inset;
+    for (let k = 0; k < 6; k++) {
+      const angle = (Math.PI / 3) * k;
+      const px = x + r * Math.cos(angle);
+      const py = y + r * Math.sin(angle);
+      if (k === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+  } else if (shape === 'triangle') {
+    const up = (((i + j) % 2) + 2) % 2 === 0;
+    const half = layout.side / 2 - inset * 1.7;
+    const height = size - inset * 2.6;
+    const top = up ? y - height * (2 / 3) : y + height * (2 / 3);
+    const base = up ? y + height / 3 : y - height / 3;
+    ctx.moveTo(x, top);
+    ctx.lineTo(x + half, base);
+    ctx.lineTo(x - half, base);
+    ctx.closePath();
+  } else if (shape === 'diamond') {
+    const r = size / 2 - inset;
+    ctx.moveTo(x, y - r);
+    ctx.lineTo(x + r, y);
+    ctx.lineTo(x, y + r);
+    ctx.lineTo(x - r, y);
+    ctx.closePath();
+  } else if (shape === 'circle') {
+    ctx.moveTo(x + size / 2 - inset, y);
+    ctx.arc(x, y, Math.max(0.5, size / 2 - inset), 0, Math.PI * 2);
+  } else if (shape === 'tile') {
+    const half = size / 2 - Math.max(inset, size * 0.06);
+    const r = Math.min(half, size * 0.22);
+    ctx.roundRect(x - half, y - half, half * 2, half * 2, r);
+  } else if (shape === 'cross') {
+    const arm = size * 0.16 + inset;
+    ctx.moveTo(x - arm, y);
+    ctx.lineTo(x + arm, y);
+    ctx.moveTo(x, y - arm);
+    ctx.lineTo(x, y + arm);
+  } else if (shape === 'dot') {
+    const r = size * 0.05 + inset;
+    ctx.moveTo(x + r, y);
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+  } else {
+    const half = size / 2 - inset;
+    ctx.rect(x - half, y - half, half * 2, half * 2);
+  }
+};
+
+function ShapeGrid({
+  shape = 'square',
+  cellSize = 40,
+  lineWidth = 1,
+  direction = 'diagonal',
+  speed = 0.5,
+  lineColor = '#2a2734',
+  hoverColor = '#ffffff',
+  hoverFillColor,
+  fillOpacity = 0.15,
+  rainbow = false,
+  tiltX = 0,
+  tiltY = 0,
+  radius = 1.5,
+  trail = 0.6,
+  glow = 0.35,
+  twinkle = 0,
+  fade = 1,
+  clickCascade = true,
+  intro = true,
+  opacity = 1,
+  backgroundColor = 'transparent',
+  paused = false,
+  dpr,
+  className = '',
+  style
+}) {
+  const containerRef = useRef(null);
+  const canvasRef = useRef(null);
+  const engineRef = useRef(null);
+  const settingsRef = useRef(null);
+
+  settingsRef.current = {
+    shape: SHAPES.includes(shape) ? shape : 'square',
+    cellSize: Math.max(8, cellSize),
+    lineWidth: Math.max(0.25, lineWidth),
+    direction: DIRECTIONS[direction] ? direction : 'diagonal',
+    speed: Math.max(0, speed),
+    lineColor,
+    hoverColor,
+    hoverFillColor: hoverFillColor ?? hoverColor,
+    fillOpacity: clamp(fillOpacity, 0, 1),
+    rainbow,
+    tone: clamp(lightnessOf(hoverColor), 0.45, 0.68),
+    tiltX: clamp(tiltX, -70, 70),
+    tiltY: clamp(tiltY, -70, 70),
+    radius: Math.max(0, radius),
+    trail: Math.max(0.05, trail),
+    glow: clamp(glow, 0, 1),
+    twinkle: clamp(twinkle, 0, 1),
+    clickCascade,
+    intro,
+    paused,
+    dpr
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const canvas = canvasRef.current;
+    if (!container || !canvas) return undefined;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return undefined;
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+
+    const state = {
+      alive: true,
+      raf: 0,
+      last: 0,
+      time: 0,
+      visible: true,
+      width: 1,
+      height: 1,
+      ratio: 1,
+      view: flatView(1, 1),
+      offsetX: 0,
+      offsetY: 0,
+      started: false,
+      startedAt: 0,
+      inside: false,
+      pointerX: 0,
+      pointerY: 0,
+      spotX: 0,
+      spotY: 0,
+      spotVX: 0,
+      spotVY: 0,
+      spotPower: 0,
+      lit: new Map(),
+      hues: new Map(),
+      cascades: [],
+      cascadeHue: 0
+    };
+
+    const resize = () => {
+      const s = settingsRef.current;
+      const width = Math.max(1, container.clientWidth);
+      const height = Math.max(1, container.clientHeight);
+      const view = viewFor(s.tiltX, s.tiltY, width, height, s.cellSize);
+      let ratio = s.dpr ?? Math.min(window.devicePixelRatio || 1, 2);
+      const pixels = view.width * view.height * ratio * ratio;
+      if (pixels > MAX_PIXELS) ratio *= Math.sqrt(MAX_PIXELS / pixels);
+      state.width = width;
+      state.height = height;
+      state.ratio = ratio;
+      state.view = view;
+      const pixelWidth = Math.max(1, Math.round(view.width * ratio));
+      const pixelHeight = Math.max(1, Math.round(view.height * ratio));
+      if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+        canvas.width = pixelWidth;
+        canvas.height = pixelHeight;
+      }
+      const cssWidth = `${view.width}px`;
+      const cssHeight = `${view.height}px`;
+      if (canvas.style.width !== cssWidth) canvas.style.width = cssWidth;
+      if (canvas.style.height !== cssHeight) canvas.style.height = cssHeight;
+      if (canvas.style.transform !== view.transform) canvas.style.transform = view.transform;
+    };
+
+    const toPlane = (x, y) => {
+      const { inverse, far } = state.view;
+      if (!inverse) return [x, y];
+      if (inverse[6] * x + inverse[7] * y + inverse[8] < 1 / far) return null;
+      return project(inverse, x, y);
+    };
+
+    const range = (layout, margin) => {
+      const { stepX, stepY } = layout;
+      const { view } = state;
+      return [
+        Math.floor((state.offsetX + view.x0 - margin) / stepX) - 1,
+        Math.ceil((state.offsetX + view.x0 + view.width + margin) / stepX) + 1,
+        Math.floor((state.offsetY + view.y0 - margin) / stepY) - 1,
+        Math.ceil((state.offsetY + view.y0 + view.height + margin) / stepY) + 1
+      ];
+    };
+
+    const nearestCell = (s, layout, wx, wy) => {
+      const { stepX, stepY } = layout;
+      const ci = Math.round(wx / stepX);
+      const cj = Math.round(wy / stepY);
+      let best = Infinity;
+      let cell = [ci, cj];
+      for (let i = ci - 2; i <= ci + 2; i++) {
+        for (let j = cj - 2; j <= cj + 2; j++) {
+          const [x, y] = centerOf(s.shape, layout, i, j);
+          const d = (x - wx) ** 2 + (y - wy) ** 2;
+          if (d < best) {
+            best = d;
+            cell = [i, j];
+          }
+        }
+      }
+      return cell;
+    };
+
+    const illuminate = (s, layout, dt) => {
+      const decay = Math.exp(-dt / s.trail);
+      for (const [key, value] of state.lit) {
+        const next = value * decay;
+        if (next < 0.004) {
+          state.lit.delete(key);
+          state.hues.delete(key);
+        } else state.lit.set(key, next);
+      }
+      if (state.spotPower < 0.01) return;
+      const wx = state.spotX + state.offsetX;
+      const wy = state.spotY + state.offsetY;
+      const reach = Math.max(s.radius, 0.5) * s.cellSize;
+      const [hi, hj] = nearestCell(s, layout, wx, wy);
+      const spanI = Math.ceil(reach / layout.stepX) + 2;
+      const spanJ = Math.ceil(reach / layout.stepY) + 2;
+      const hue = state.time * 120;
+      for (let i = hi - spanI; i <= hi + spanI; i++) {
+        for (let j = hj - spanJ; j <= hj + spanJ; j++) {
+          const [x, y] = centerOf(s.shape, layout, i, j);
+          const distance = Math.hypot(x - wx, y - wy);
+          let value = s.radius > 0 ? smoothstep(reach, reach * 0.15, distance) : 0;
+          if (i === hi && j === hj) value = Math.max(value, 1);
+          value *= state.spotPower;
+          if (value <= 0.004) continue;
+          const key = keyOf(i, j);
+          if (value > (state.lit.get(key) ?? 0)) {
+            state.lit.set(key, value);
+            state.hues.set(key, hue + ((x + y) / s.cellSize) * 12);
+          }
+        }
+      }
+    };
+
+    const cascadeAt = (s, x, y) => {
+      let value = 0;
+      for (const cascade of state.cascades) {
+        const ring = Math.round(Math.hypot(x - cascade.x, y - cascade.y) / s.cellSize);
+        const local = state.time - cascade.time - ring * 0.055;
+        if (local < 0) continue;
+        const pulse = Math.exp(-((local / 0.085) ** 2)) * cascade.power * Math.max(0, 1 - ring / cascade.reach);
+        if (pulse > value) {
+          value = pulse;
+          state.cascadeHue = cascade.hue + ring * 16;
+        }
+      }
+      return value;
+    };
+
+    const draw = () => {
+      const s = settingsRef.current;
+      const { view, ratio } = state;
+      const layout = layoutFor(s.shape, s.cellSize);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.setTransform(ratio, 0, 0, ratio, -view.x0 * ratio, -view.y0 * ratio);
+
+      const left = view.x0;
+      const top = view.y0;
+      const right = view.x0 + view.width;
+      const bottom = view.y0 + view.height;
+      const size = s.cellSize;
+      const [i0, i1, j0, j1] = range(layout, size);
+      const markers = s.shape === 'cross' || s.shape === 'dot';
+      const elapsed = state.time - state.startedAt;
+      const introRadius = s.intro && !reduce ? elapsed * view.reach * 1.8 : Infinity;
+      const originX = state.width / 2;
+      const originY = state.height / 2;
+      const centerX = originX + state.offsetX;
+      const centerY = originY + state.offsetY;
+
+      ctx.lineWidth = s.lineWidth;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = s.lineColor;
+      ctx.fillStyle = s.lineColor;
+      ctx.beginPath();
+      if (s.shape === 'square') {
+        for (let i = i0; i <= i1; i++) {
+          const x = i * layout.stepX - state.offsetX;
+          ctx.moveTo(x, top - size);
+          ctx.lineTo(x, bottom + size);
+        }
+        for (let j = j0; j <= j1; j++) {
+          const y = j * layout.stepY - state.offsetY;
+          ctx.moveTo(left - size, y);
+          ctx.lineTo(right + size, y);
+        }
+      } else {
+        for (let i = i0; i <= i1; i++) {
+          for (let j = j0; j <= j1; j++) {
+            const [cx, cy] = centerOf(s.shape, layout, i, j);
+            traceCell(ctx, s.shape, layout, size, i, j, cx - state.offsetX, cy - state.offsetY, 0);
+          }
+        }
+      }
+      if (s.shape === 'dot') ctx.fill();
+      else ctx.stroke();
+
+      if (introRadius !== Infinity) {
+        const gradient = ctx.createRadialGradient(originX, originY, 0, originX, originY, Math.max(1, introRadius));
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+        gradient.addColorStop(0.82, 'rgba(0, 0, 0, 1)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.fillStyle = gradient;
+        ctx.fillRect(left, top, view.width, view.height);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      const glowing = s.glow > 0;
+      for (let i = i0; i <= i1; i++) {
+        for (let j = j0; j <= j1; j++) {
+          const [cx, cy] = centerOf(s.shape, layout, i, j);
+          const key = keyOf(i, j);
+          let value = state.lit.get(key) ?? 0;
+          let hue = state.hues.get(key) ?? 0;
+          if (state.cascades.length) {
+            const pulse = cascadeAt(s, cx, cy);
+            if (pulse > value) {
+              value = pulse;
+              hue = state.cascadeHue;
+            }
+          }
+          if (s.twinkle > 0 && !reduce) {
+            const seed = hash(i, j);
+            const wave = Math.sin(state.time * (0.35 + seed * 0.5) + seed * 40);
+            const sparkle = s.twinkle * 0.7 * Math.max(0, wave) ** 18;
+            if (sparkle > value) {
+              value = sparkle;
+              hue = seed * 360;
+            }
+          }
+          if (introRadius !== Infinity) {
+            const front = introRadius - Math.hypot(cx - centerX, cy - centerY);
+            if (front < 0) continue;
+            const wave = Math.exp(-((front / (size * 1.4)) ** 2)) * 0.85;
+            if (wave > value) {
+              value = wave;
+              hue = (Math.atan2(cy - centerY, cx - centerX) * 180) / Math.PI + state.time * 120;
+            }
+          }
+          if (value <= 0.01) continue;
+          const color = s.rainbow ? tint(hue, s.tone) : s.hoverColor;
+          const x = cx - state.offsetX;
+          const y = cy - state.offsetY;
+          ctx.beginPath();
+          traceCell(ctx, s.shape, layout, size, i, j, x, y, markers ? value * size * 0.08 : s.lineWidth * 0.5);
+          if (markers) {
+            ctx.globalAlpha = Math.min(1, value);
+            if (glowing) {
+              ctx.shadowColor = color;
+              ctx.shadowBlur = s.glow * 14 * value;
+            }
+            if (s.shape === 'dot') {
+              ctx.fillStyle = color;
+              ctx.fill();
+            } else {
+              ctx.strokeStyle = color;
+              ctx.lineWidth = s.lineWidth * (1 + value * 0.6);
+              ctx.stroke();
+            }
+            ctx.shadowBlur = 0;
+            continue;
+          }
+          if (s.fillOpacity > 0) {
+            ctx.globalAlpha = Math.min(1, value) * s.fillOpacity;
+            ctx.fillStyle = s.rainbow ? color : s.hoverFillColor;
+            ctx.fill();
+          }
+          ctx.globalAlpha = Math.min(1, value) * 0.85;
+          if (glowing) {
+            ctx.shadowColor = color;
+            ctx.shadowBlur = s.glow * 16 * value;
+          }
+          ctx.strokeStyle = color;
+          ctx.lineWidth = s.lineWidth;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+      }
+      ctx.globalAlpha = 1;
+
+      if (view.mist) {
+        const [mx0, my0, mx1, my1] = view.mist;
+        const gradient = ctx.createLinearGradient(mx0, my0, mx1, my1);
+        for (let k = 0; k <= 8; k++) {
+          const t = k / 8;
+          gradient.addColorStop(t, `rgba(0, 0, 0, ${(1 - smootherstep(t)).toFixed(3)})`);
+        }
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.fillStyle = gradient;
+        ctx.fillRect(left, top, view.width, view.height);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+    };
+
+    const frame = now => {
+      state.raf = 0;
+      if (!state.alive) return;
+      const s = settingsRef.current;
+      const dt = state.last ? Math.min(0.05, (now - state.last) / 1000) : 1 / 60;
+      state.last = now;
+      resize();
+      if (!state.started) {
+        state.started = true;
+        state.startedAt = state.time;
+      }
+      if (!s.paused) {
+        state.time += dt;
+        if (!reduce) {
+          const [dx, dy] = DIRECTIONS[s.direction];
+          state.offsetX -= dx * s.speed * 60 * dt;
+          state.offsetY -= dy * s.speed * 60 * dt;
+        }
+        const want = state.inside ? 1 : 0;
+        state.spotPower += (want - state.spotPower) * (1 - Math.exp(-(want ? 10 : 5) * dt));
+        const stiffness = 220;
+        const damping = 2 * Math.sqrt(stiffness) * 0.85;
+        state.spotVX += (stiffness * (state.pointerX - state.spotX) - damping * state.spotVX) * dt;
+        state.spotVY += (stiffness * (state.pointerY - state.spotY) - damping * state.spotVY) * dt;
+        state.spotX += state.spotVX * dt;
+        state.spotY += state.spotVY * dt;
+        illuminate(s, layoutFor(s.shape, s.cellSize), dt);
+        state.cascades = state.cascades.filter(cascade => state.time - cascade.time < cascade.reach * 0.055 + 0.4);
+      }
+      draw();
+      const settled =
+        s.paused ||
+        (s.speed === 0 || s.direction === 'none' || reduce
+          ? state.lit.size === 0 &&
+            state.cascades.length === 0 &&
+            s.twinkle === 0 &&
+            state.spotPower < 0.005 &&
+            state.time - state.startedAt > 3
+          : false);
+      if (!settled && state.visible) state.raf = requestAnimationFrame(frame);
+      else state.last = 0;
+    };
+
+    const wake = () => {
+      if (!state.raf && state.alive && state.visible) state.raf = requestAnimationFrame(frame);
+    };
+
+    const pointFrom = event => {
+      const rect = container.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      if (x < 0 || y < 0 || x > rect.width || y > rect.height) return null;
+      return toPlane(x, y);
+    };
+
+    const onMove = event => {
+      const point = pointFrom(event);
+      if (point && !state.inside && state.spotPower < 0.02) {
+        state.spotX = point[0];
+        state.spotY = point[1];
+        state.spotVX = 0;
+        state.spotVY = 0;
+      }
+      state.inside = point !== null;
+      if (point) {
+        state.pointerX = point[0];
+        state.pointerY = point[1];
+        wake();
+      }
+    };
+
+    const onLeave = () => {
+      state.inside = false;
+    };
+
+    const onDown = event => {
+      const s = settingsRef.current;
+      if (!s.clickCascade) return;
+      const point = pointFrom(event);
+      if (!point) return;
+      state.cascades.push({
+        x: point[0] + state.offsetX,
+        y: point[1] + state.offsetY,
+        time: state.time,
+        power: 1,
+        reach: Math.hypot(state.view.width, state.view.height) / s.cellSize,
+        hue: state.time * 120
+      });
+      if (state.cascades.length > 6) state.cascades.shift();
+      wake();
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      resize();
+      draw();
+      wake();
+    });
+    resizeObserver.observe(container);
+
+    const visibility = new IntersectionObserver(entries => {
+      state.visible = entries.some(entry => entry.isIntersecting);
+      if (state.visible) wake();
+    });
+    visibility.observe(container);
+
+    window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('pointerdown', onDown, { passive: true });
+    document.documentElement.addEventListener('pointerleave', onLeave);
+    window.addEventListener('blur', onLeave);
+
+    engineRef.current = {
+      redraw: () => {
+        resize();
+        draw();
+        wake();
+      }
+    };
+
+    resize();
+    wake();
+
+    return () => {
+      state.alive = false;
+      cancelAnimationFrame(state.raf);
+      resizeObserver.disconnect();
+      visibility.disconnect();
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerdown', onDown);
+      document.documentElement.removeEventListener('pointerleave', onLeave);
+      window.removeEventListener('blur', onLeave);
+      engineRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    engineRef.current?.redraw();
+  });
+
+  const mask = fadeMask(clamp(fade, 0, 1));
+
+  return (
+    <div
+      ref={containerRef}
+      className={`shape-grid ${className}`.trim()}
+      style={{
+        opacity: clamp(opacity, 0, 1),
+        backgroundColor,
+        ...(mask === 'none'
+          ? null
+          : { maskImage: mask, WebkitMaskImage: mask, maskComposite: 'intersect', WebkitMaskComposite: 'source-in' }),
+        ...style
+      }}
+    >
+      <canvas ref={canvasRef} className="shape-grid-canvas" />
+    </div>
+  );
+}
+
+
+
+    // ─── Components ───────────────────────────────────────────────────────────
+    function Toast({ message, visible }) {
+      return <div className={'toast' + (visible ? ' show' : '')} role="status" aria-live="polite">{message}</div>;
+    }
+
+    function TypingIndicator() {
+      return (
+        <div className="message-row bot">
+          <div className="message-avatar" aria-hidden="true">✦</div>
+          <div className="message-wrap">
+            <div className="message-meta"><span>Campus Assistant</span><span>typing</span></div>
+            <div className="message-bubble">
+              <span className="typing" aria-label="Assistant is typing"><i></i><i></i><i></i></span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function MessageRow({ role, content, time }) {
+      const isUser = role === 'user';
+      return (
+        <div className={'message-row' + (isUser ? ' user' : '')}>
+          <div className="message-avatar" aria-hidden="true">{isUser ? '☺' : '✦'}</div>
+          <div className="message-wrap">
+            <div className="message-meta">
+              <span>{isUser ? 'You' : 'Campus Assistant'}</span>
+              <span>{time}</span>
+            </div>
+            <div className="message-bubble">{content}</div>
+          </div>
+        </div>
+      );
+    }
+
+    function WelcomeBlock({ onQuickPrompt }) {
+      return (
+        <>
+          <div className="welcome">
+            <div className="welcome-orb" aria-hidden="true">✦</div>
+            <div className="eyebrow">Your campus, simplified</div>
+            <h1>Hey there, student!<br /><span className="gradient-text">What can I help with?</span></h1>
+            <p>Ask about exams, assignments, attendance, practicals or college life. I'll share useful guidance and point you to the right department when official information is needed.</p>
+          </div>
+          <div className="quick-section">
+            <div className="quick-title"><span aria-hidden="true">✦</span> Try a quick question</div>
+            <div className="quick-grid">
+              {[
+                { icon: '▤', label: 'Exam Help', prompt: 'How should I prepare for my exams?' },
+                { icon: '▧', label: 'Assignment Help', prompt: 'How do I plan and submit an assignment?' },
+                { icon: '☼', label: 'Study Tips', prompt: 'Give me simple study tips for better learning.' },
+              ].map(item => (
+                <button key={item.label} type="button" className="quick-button" onClick={() => onQuickPrompt(item.prompt)}>
+                  <span className="quick-icon">{item.icon}</span>
+                  <span>{item.label} <span aria-hidden="true">↗</span></span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    function Sidebar({ onNavPrompt, onHome, activeNav, setActiveNav }) {
+      const explore = [
+        { key: 'home', icon: '⌂', label: 'Helpdesk home' },
+        { key: 'exam', icon: '▤', label: 'Exam guidance', prompt: 'How should I prepare for my exams?' },
+        { key: 'assign', icon: '▧', label: 'Assignments', prompt: 'How do I plan and submit an assignment?' },
+        { key: 'attend', icon: '▦', label: 'Attendance', prompt: 'What should I know about attendance requirements?' },
+        { key: 'prac', icon: '⚗', label: 'Practicals & labs', prompt: 'How should I prepare for practicals or lab work?' },
+        { key: 'act', icon: '✳', label: 'College activities', prompt: 'Where can I find information about college activities?' },
+      ];
+      const smarter = [
+        { key: 'tips', icon: '☼', label: 'Study tips', prompt: 'Give me simple study tips for better learning.' },
+        { key: 'time', icon: '◷', label: 'Time management', prompt: 'How can I organize my weekly study schedule?' },
+      ];
+      return (
+        <aside className="side-panel" aria-label="Help topics">
+          <section>
+            <h2 className="side-heading">Explore help</h2>
+            <nav className="nav-list">
+              {explore.map(item => (
+                <button key={item.key} type="button"
+                  className={'nav-item' + (activeNav === item.key ? ' active' : '')}
+                  onClick={() => { setActiveNav(item.key); item.key === 'home' ? onHome() : onNavPrompt(item.prompt); }}>
+                  <span className="nav-icon">{item.icon}</span>
+                  <span className="nav-label">{item.label}</span>
+                </button>
+              ))}
+            </nav>
+          </section>
+          <section>
+            <h2 className="side-heading">Study smarter</h2>
+            <nav className="nav-list">
+              {smarter.map(item => (
+                <button key={item.key} type="button"
+                  className={'nav-item' + (activeNav === item.key ? ' active' : '')}
+                  onClick={() => { setActiveNav(item.key); onNavPrompt(item.prompt); }}>
+                  <span className="nav-icon">{item.icon}</span>
+                  <span className="nav-label">{item.label}</span>
+                </button>
+              ))}
+            </nav>
+          </section>
+          <div className="mini-card">
+            <div className="mini-card-icon">✓</div>
+            <strong>Guidance you can trust</strong>
+            <p>This demo uses sample guidance. Official dates, policies and requirements should always be confirmed with your college.</p>
+            <div className="privacy"><span aria-hidden="true">●</span> No API key in the browser</div>
+          </div>
+        </aside>
+      );
+    }
+
+    // ─── App ──────────────────────────────────────────────────────────────────
+    function App() {
+      const [messages, setMessages] = useState([]);
+      const [inputValue, setInputValue] = useState('');
+      const [busy, setBusy] = useState(false);
+      const [showWelcome, setShowWelcome] = useState(true);
+      const [isTyping, setIsTyping] = useState(false);
+      const [toast, setToast] = useState({ message: '', visible: false });
+      const [activeNav, setActiveNav] = useState('home');
+
+      const chatBodyRef = useRef(null);
+      const inputRef = useRef(null);
+      const toastTimer = useRef(null);
+      const replyTimer = useRef(null);
+
+      useEffect(() => {
+        if (chatBodyRef.current) chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
+      }, [messages, isTyping]);
+
+      function showToast(msg) {
+        clearTimeout(toastTimer.current);
+        setToast({ message: msg, visible: true });
+        toastTimer.current = setTimeout(() => setToast(t => ({ ...t, visible: false })), 2400);
+      }
+
+      function sendMessage(raw) {
+        const question = String(raw ?? '').trim();
+        if (!question) { showToast('Please type a question first.'); inputRef.current?.focus(); return; }
+        if (busy) { showToast('Please wait for the current reply.'); return; }
+        if (question.length > 600) { showToast('Please keep your question under 600 characters.'); return; }
+
+        setShowWelcome(false);
+        setBusy(true);
+        setInputValue('');
+        const t = getTime();
+        setMessages(prev => [...prev, { id: Date.now(), role: 'user', content: question, time: t }]);
+        setIsTyping(true);
+
+        replyTimer.current = setTimeout(() => {
+          const t2 = getTime();
+          setIsTyping(false);
+          setMessages(prev => [...prev, { id: Date.now() + 1, role: 'bot', content: getAnswer(question), time: t2 }]);
+          setBusy(false);
+          inputRef.current?.focus();
+        }, 420);
+      }
+
+      function refreshChat() {
+        clearTimeout(replyTimer.current);
+        setMessages([]);
+        setShowWelcome(true);
+        setIsTyping(false);
+        setBusy(false);
+        setInputValue('');
+        setActiveNav('home');
+        showToast('Chat refreshed. Ready for a new question!');
+        inputRef.current?.focus();
+      }
+
+      return (
+        <main className="app-root" id="appRoot">
+          <div className="shell">
+            <header className="topbar">
+              <button className="brand" onClick={refreshChat} aria-label="AI Student Helpdesk home">
+                <span className="brand-mark" aria-hidden="true">✦</span>
+                <span className="brand-copy">
+                  <span className="brand-title">AI Student Helpdesk</span>
+                  <span className="brand-sub">Your 24/7 college assistant</span>
+                </span>
+              </button>
+              <div className="top-actions">
+                <div className="availability"><span className="status-dot"></span> Available 24/7</div>
+                <button className="icon-button" type="button" title="Clear the current conversation" onClick={refreshChat}>
+                  <span aria-hidden="true">↻</span> Refresh chat
+                </button>
+              </div>
+            </header>
+
+            <div className="layout">
+              <Sidebar onNavPrompt={sendMessage} onHome={refreshChat} activeNav={activeNav} setActiveNav={setActiveNav} />
+
+              <section className="chat-panel" aria-label="Student support chatbot">
+                <div className="chat-grid-backdrop" aria-hidden="true">
+                  <ShapeGrid
+                    shape="cross"
+                    direction="down"
+                    lineColor="#2a2734"
+                    hoverColor="#f97316"
+                    hoverFillColor="#ffffff"
+                    fillOpacity={0.15}
+                    cellSize={40}
+                    speed={0.5}
+                    tiltX={0}
+                    tiltY={0}
+                    rainbow={false}
+                    lineWidth={1}
+                    radius={1.5}
+                    trail={0.6}
+                    glow={0.35}
+                    twinkle={0}
+                    fade={1}
+                    clickCascade
+                    intro
+                  />
+                </div>
+
+                <header className="chat-header">
+                  <div className="assistant-title">
+                    <div className="assistant-avatar" aria-hidden="true">✦</div>
+                    <div>
+                      <div className="assistant-name">Campus Assistant</div>
+                      <div className="assistant-state"><span className="status-dot"></span> Ready to help with student questions</div>
+                    </div>
+                  </div>
+                  <div className="chat-header-tag">SAMPLE FAQ MODE</div>
+                </header>
+
+                <div className="chat-body" ref={chatBodyRef} aria-live="polite" aria-label="Conversation">
+                  {showWelcome && <WelcomeBlock onQuickPrompt={sendMessage} />}
+                  {messages.map(msg => <MessageRow key={msg.id} role={msg.role} content={msg.content} time={msg.time} />)}
+                  {isTyping && <TypingIndicator />}
+                </div>
+
+                <footer className="chat-footer">
+                  <form className="composer" onSubmit={e => { e.preventDefault(); sendMessage(inputValue); }}>
+                    <label className="visually-hidden" htmlFor="messageInput">Type your student question</label>
+                    <input
+                      id="messageInput" ref={inputRef} name="question" type="text"
+                      maxLength={600} autoComplete="off"
+                      placeholder="Ask anything about college life..."
+                      value={inputValue} onChange={e => setInputValue(e.target.value)}
+                    />
+                    <button className="send-button" type="submit" aria-label="Send message">
+                      <span aria-hidden="true">➤</span>
+                    </button>
+                  </form>
+                  <div className="composer-hint">Helpful guidance for everyday student questions · <strong>Verify official information with your college</strong></div>
+                  <div className="footer-line">
+                    <span className="footer-brand"><span aria-hidden="true">✦</span> Built for students, powered by helpful answers</span>
+                    <span className="keyboard">Press <kbd>Enter</kbd> to send</span>
+                  </div>
+                </footer>
+              </section>
+            </div>
+          </div>
+          <Toast message={toast.message} visible={toast.visible} />
+        </main>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
+
